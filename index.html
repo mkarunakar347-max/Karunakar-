@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Library Management System</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">📚</div>
+      <div><strong>Library</strong><small>Management System</small></div>
+    </div>
+    <nav>
+      <button class="nav-btn active" data-page="dashboard">📊 Dashboard</button>
+      <button class="nav-btn" data-page="books">📚 Books</button>
+      <button class="nav-btn" data-page="members">👥 Members</button>
+      <button class="nav-btn" data-page="loans">🔄 Issue / Return</button>
+      <button class="nav-btn" data-page="payments">💳 Payments</button>
+      <button class="nav-btn" data-page="reports">📈 Reports</button>
+    </nav>
+    <div class="sidebar-footer">Local Library System<br><span>Node.js + SQLite</span></div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <button id="menuBtn" class="mobile-menu">☰</button>
+        <h1 id="pageTitle">Dashboard</h1>
+        <p id="pageSubtitle">Library overview and activity</p>
+      </div>
+      <div class="date-box" id="today"></div>
+    </header>
+
+    <section id="dashboard" class="page active">
+      <div class="cards">
+        <div class="card"><span class="icon">📚</span><div><small>Total Books</small><strong id="statBooks">0</strong></div></div>
+        <div class="card"><span class="icon">👥</span><div><small>Members</small><strong id="statMembers">0</strong></div></div>
+        <div class="card"><span class="icon">📖</span><div><small>Currently Issued</small><strong id="statIssued">0</strong></div></div>
+        <div class="card warning"><span class="icon">⏰</span><div><small>Overdue</small><strong id="statOverdue">0</strong></div></div>
+      </div>
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-head"><h2>Library Status</h2></div>
+          <div class="status-box"><span>Available book copies</span><strong id="availableCopies">0</strong></div>
+          <div class="status-box"><span>Active loans</span><strong id="activeLoans">0</strong></div>
+          <div class="status-box"><span>Overdue loans</span><strong id="overdueLoans">0</strong></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h2>Quick Actions</h2></div>
+          <div class="quick-actions">
+            <button class="primary" onclick="openBookModal()">＋ Add Book</button>
+            <button class="secondary" onclick="openMemberModal()">＋ Add Member</button>
+            <button class="secondary" onclick="showPage('loans')">↔ Issue / Return</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="books" class="page">
+      <div class="toolbar">
+        <input id="bookSearch" placeholder="Search title, author, ISBN or category..." oninput="loadBooks()">
+        <button class="primary" onclick="openBookModal()">＋ Add Book</button>
+      </div>
+      <div class="panel table-panel">
+        <table><thead><tr><th>Book</th><th>Author</th><th>ISBN</th><th>Category</th><th>Copies</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="booksTable"></tbody></table>
+      </div>
+    </section>
+
+    <section id="members" class="page">
+      <div class="toolbar">
+        <input id="memberSearch" placeholder="Search name, email, phone or member ID..." oninput="loadMembers()">
+        <button class="primary" onclick="openMemberModal()">＋ Add Member</button>
+      </div>
+      <div class="panel table-panel">
+        <table><thead><tr><th>Member ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Joined</th><th>Actions</th></tr></thead>
+        <tbody id="membersTable"></tbody></table>
+      </div>
+    </section>
+
+    <section id="loans" class="page">
+      <div class="toolbar">
+        <div class="toolbar-title">Book Circulation</div>
+        <button class="primary" onclick="openIssueModal()">＋ Issue Book</button>
+      </div>
+      <div class="panel table-panel">
+        <table><thead><tr><th>Book</th><th>Member</th><th>Issue Date</th><th>Due Date</th><th>Status</th><th>Fine</th><th>Action</th></tr></thead>
+        <tbody id="loansTable"></tbody></table>
+      </div>
+    </section>
+
+    <section id="payments" class="page">
+      <div class="toolbar">
+        <div class="toolbar-title">Payment Management</div>
+        <button class="primary" onclick="openPaymentModal()">＋ Record Payment</button>
+      </div>
+      <div class="cards">
+        <div class="card"><span class="icon">💳</span><div><small>Total Payments</small><strong id="paymentTotal">₹0</strong></div></div>
+        <div class="card"><span class="icon">📅</span><div><small>Today's Payments</small><strong id="paymentToday">₹0</strong></div></div>
+      </div>
+      <div class="panel table-panel">
+        <table><thead><tr><th>Receipt</th><th>Member</th><th>Purpose</th><th>Amount</th><th>Method</th><th>Date</th><th>Status</th></tr></thead>
+        <tbody id="paymentsTable"></tbody></table>
+      </div>
+    </section>
+
+    <section id="reports" class="page">
+      <div class="cards"><div class="card"><span class="icon">💰</span><div><small>Total Recorded Fines</small><strong id="totalFines">₹0</strong></div></div></div>
+      <div class="grid-2">
+        <div class="panel"><div class="panel-head"><h2>Most Issued Books</h2></div><div id="popularBooks"></div></div>
+        <div class="panel"><div class="panel-head"><h2>Overdue Books</h2></div><div id="overdueList"></div></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div id="modal" class="modal">
+  <div class="modal-box">
+    <div class="modal-head"><h2 id="modalTitle"></h2><button onclick="closeModal()">×</button></div>
+    <form id="modalForm"></form>
+  </div>
+</div>
+<div id="toast"></div>
+<script src="app.js"></script>
+</body>
+</html>
